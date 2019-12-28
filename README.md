@@ -3,7 +3,7 @@
 BMO is a slack bot.
 
 ## Required package
-Thank you nlopes@, for providing great library.  
+Thank you nlopes@, for providing this great library.  
 https://github.com/nlopes/slack  
 
 ## Env
@@ -24,6 +24,15 @@ User name of the bot, starts with "U-"
 
 ## Functions
 ### vote
+**Syntax**
+```
+name++ <discription>
+```
+
+Increment *name*'s the number of votes.  
+For now, BMO can't count 😢
 
 ## ToDo
-- counting numbers of vote
+- counting number of votes 🔢
+- decrement 👎
+- add new functions 🆕
