@@ -20,10 +20,10 @@ you can find it in your app's settings under *Install App* > *Bot User OAuth Acc
 It starts with "xoxb-".  
 - VTOKEN: It's in *Basic Information* setting, showed as "Verification Token".  
 - BOTUNAME:  
-User name of the bot, starts with "U..."  
+User name of the bot, starts with "U-"  
 
 ## Functions
 ### vote
 
 ## ToDo
-- Maybe `votable` and `parse` should be combined.
+- `votable` and `parse` functions should be combined.
