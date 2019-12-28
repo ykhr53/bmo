@@ -47,7 +47,7 @@ func main() {
 			case *slackevents.MessageEvent:
 				if ev.User != botname && parse(ev.Text) != nil {
 					for _, name := range parse(ev.Text) {
-						text := strings.TrimRight(name, "++ ") + " voted!"
+						text := strings.TrimRight(name, "++ ") + " : <ここに数字が入る> voted!"
 						api.PostMessage(ev.Channel, slack.MsgOptionText(text, false))
 					}
 				}

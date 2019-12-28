@@ -26,4 +26,4 @@ User name of the bot, starts with "U-"
 ### vote
 
 ## ToDo
-- `votable` and `parse` functions should be combined.
+- counting numbers of vote
