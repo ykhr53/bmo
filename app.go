@@ -24,6 +24,7 @@ func main() {
 		buf.ReadFrom(r.Body)
 		body := buf.String()
 		eventsAPIEvent, e := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: vtoken}))
+
 		if e != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
@@ -37,13 +38,14 @@ func main() {
 			w.Header().Set("Content-Type", "text")
 			w.Write([]byte(r.Challenge))
 		}
+
 		if eventsAPIEvent.Type == slackevents.CallbackEvent {
 			innerEvent := eventsAPIEvent.InnerEvent
 			switch ev := innerEvent.Data.(type) {
 			case *slackevents.AppMentionEvent:
 				api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 			case *slackevents.MessageEvent:
-				if ev.User != botname && votable(ev.Text) {
+				if ev.User != botname && parse(ev.Text) != nil {
 					for _, name := range parse(ev.Text) {
 						text := strings.TrimRight(name, "++ ") + " voted!"
 						api.PostMessage(ev.Channel, slack.MsgOptionText(text, false))
@@ -64,16 +66,8 @@ func getenv(name string) string {
 	return v
 }
 
-func votable(text string) bool {
-	r := regexp.MustCompile(`\S+\+\+\s`)
-	return r.MatchString(text)
-}
-
 func parse(text string) []string {
 	r := regexp.MustCompile(`\S+\+\+\s`)
 	names := r.FindAllString(text, -1)
-	if names == nil {
-		return nil
-	}
 	return names
 }
