@@ -30,7 +30,6 @@ name++ <discription>
 ```
 
 Increment *name*'s the number of votes.  
-For now, BMO can't count 😢
 
 ## ToDo
 - combine multiple increments for the same name 🤝
