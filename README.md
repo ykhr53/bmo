@@ -33,6 +33,7 @@ Increment *name*'s the number of votes.
 For now, BMO can't count 😢
 
 ## ToDo
-- counting number of votes 🔢
+- be unit testable
+- enable counting number of votes 🔢
 - decrement 👎
 - add new functions 🆕
