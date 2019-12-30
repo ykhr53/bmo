@@ -6,6 +6,8 @@ BMO is a slack bot.
 Thank you nlopes@, for providing this great library.  
 https://github.com/nlopes/slack  
 
+and some others... please see go.mod.
+
 ## Env
 BMO requires three environment variables.
 
