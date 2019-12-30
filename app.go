@@ -1,4 +1,4 @@
-package bmo
+package main
 
 import (
 	"bytes"
