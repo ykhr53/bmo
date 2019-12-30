@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
+// GetVal gets value from DynamoDB
 func GetVal(ddb *dynamodb.DynamoDB, key string) (int, error) {
 	params := &dynamodb.GetItemInput{
 		TableName: aws.String("bmo"),
@@ -34,6 +35,7 @@ func GetVal(ddb *dynamodb.DynamoDB, key string) (int, error) {
 	return strconv.Atoi(*resp.Item["votes"].N)
 }
 
+// SetVal sets value from DynamoDB
 func SetVal(ddb *dynamodb.DynamoDB, key string, n string) {
 	param := &dynamodb.UpdateItemInput{
 		TableName: aws.String("bmo"),

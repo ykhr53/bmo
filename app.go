@@ -17,7 +17,7 @@ import (
 	"github.com/nlopes/slack"
 	"github.com/nlopes/slack/slackevents"
 
-	"github.com/ykhr53/bmo/pkg/ddbfunc"
+	"github.com/ykhr53/bmo/ddbfunc"
 )
 
 // BMO handles your task using following information.
@@ -73,7 +73,7 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if ev.User != b.uname && parse(ev.Text) != nil {
 				for _, name := range parse(ev.Text) {
 					name = strings.TrimRight(name, "+ ")
-					vote, _ := ddbfunc.getVal(b.client, name)
+					vote, _ := ddbfunc.GetVal(b.client, name)
 					var voteStr string
 					if vote < 0 {
 						voteStr = "1"
@@ -82,7 +82,7 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 					text := name + ": " + voteStr + " voted!"
 					b.api.PostMessage(ev.Channel, slack.MsgOptionText(text, false))
-					ddbfunc.setVal(b.client, name, voteStr)
+					ddbfunc.SetVal(b.client, name, voteStr)
 				}
 			}
 		}
