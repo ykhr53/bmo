@@ -70,7 +70,7 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case *slackevents.MessageEvent:
 			if ev.User != b.uname && parse(ev.Text) != nil {
 				for _, name := range parse(ev.Text) {
-					name = strings.TrimRight(name, "++ ")
+					name = strings.TrimRight(name, "+ ")
 					vote, _ := getVal(b.ddb, name)
 					var voteStr string
 					if vote < 0 {
