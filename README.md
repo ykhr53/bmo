@@ -29,10 +29,10 @@ name++ <discription>
 Increment *name*'s the number of votes.  
 
 ## ToDo
-- combine multiple increments for the same name 🤝
-- decrement 👎
-- be unit testable 📝
 - add new functions 🆕
 
 ## Done
 - enable counting number of votes 🔢
+- combine multiple increments for the same name 🤝
+- decrement 👎
+- be unit testable 📝

@@ -76,7 +76,6 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 
 		case *slackevents.MessageEvent:
-			b.api.PostMessage(ev.Channel, slack.MsgOptionText("text", false))
 			if ev.User != b.uname && votable(ev.Text) {
 				m := parse(ev.Text)
 				for name, votes := range m {
@@ -120,7 +119,7 @@ func getenv(name string) string {
 
 func votable(text string) bool {
 	r := regexp.MustCompile(`\S+(\+\+|--)\s`)
-	return r.MatchString("text")
+	return r.MatchString(text)
 }
 
 func parse(text string) map[string]*votes {
