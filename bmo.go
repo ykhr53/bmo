@@ -43,6 +43,11 @@ func NewBMO() *BMO {
 	return bmo
 }
 
+type votes struct {
+	sum   int
+	count int
+}
+
 func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
@@ -65,24 +70,33 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if eventsAPIEvent.Type == slackevents.CallbackEvent {
 		innerEvent := eventsAPIEvent.InnerEvent
-
 		switch ev := innerEvent.Data.(type) {
+
 		case *slackevents.AppMentionEvent:
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
+
 		case *slackevents.MessageEvent:
-			if ev.User != b.uname && parse(ev.Text) != nil {
-				for _, name := range parse(ev.Text) {
-					name = strings.TrimRight(name, "+ ")
-					vote, _ := ddbfunc.GetVal(b.client, name)
-					var voteStr string
-					if vote < 0 {
-						voteStr = "1"
-					} else {
-						voteStr = strconv.Itoa(vote + 1)
+			b.api.PostMessage(ev.Channel, slack.MsgOptionText("text", false))
+			if ev.User != b.uname && votable(ev.Text) {
+				m := parse(ev.Text)
+				for name, votes := range m {
+					if votes.sum == 0 {
+						continue
 					}
-					text := name + ": " + voteStr + " voted!"
-					b.api.PostMessage(ev.Channel, slack.MsgOptionText(text, false))
-					ddbfunc.SetVal(b.client, name, voteStr)
+					curr, err := ddbfunc.GetVal(b.client, name)
+					if curr != "unvoted" && err == nil {
+						iv, _ := strconv.Atoi(curr)
+						iv = iv + votes.sum
+						sv := strconv.Itoa(iv)
+						var text string
+						if votes.count > 1 {
+							text = name + ": " + sv + " voted! (you got " + strconv.Itoa(votes.count) + " votes)"
+						} else {
+							text = name + ": " + sv + " voted!"
+						}
+						b.api.PostMessage(ev.Channel, slack.MsgOptionText(text, false))
+						ddbfunc.SetVal(b.client, name, sv)
+					}
 				}
 			}
 		}
@@ -104,8 +118,37 @@ func getenv(name string) string {
 	return v
 }
 
-func parse(text string) []string {
-	r := regexp.MustCompile(`\S+\+\+\s`)
+func votable(text string) bool {
+	r := regexp.MustCompile(`\S+(\+\+|--)\s`)
+	return r.MatchString("text")
+}
+
+func parse(text string) map[string]*votes {
+	var isPositive bool
+	m := make(map[string]*votes)
+
+	r := regexp.MustCompile(`\S+(\+\+|--)\s`)
 	names := r.FindAllString(text, -1)
-	return names
+
+	for _, name := range names {
+		isPositive = strings.HasSuffix(name, "+ ")
+		name = strings.TrimRight(name, "+- ")
+		if v, ok := m[name]; ok {
+			v.count++
+			if isPositive {
+				v.sum++
+			} else {
+				v.sum--
+			}
+		} else {
+			m[name] = new(votes)
+			m[name].count = 1
+			if isPositive {
+				m[name].sum = 1
+			} else {
+				m[name].sum = -1
+			}
+		}
+	}
+	return m
 }

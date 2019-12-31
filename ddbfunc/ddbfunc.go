@@ -2,14 +2,13 @@ package ddbfunc
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 // GetVal gets value from DynamoDB
-func GetVal(ddb *dynamodb.DynamoDB, key string) (int, error) {
+func GetVal(ddb *dynamodb.DynamoDB, key string) (string, error) {
 	params := &dynamodb.GetItemInput{
 		TableName: aws.String("bmo"),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -27,12 +26,12 @@ func GetVal(ddb *dynamodb.DynamoDB, key string) (int, error) {
 	resp, err := ddb.GetItem(params)
 	if err != nil {
 		fmt.Println(err.Error())
-		return -1, nil
+		return "unvoted", err
 	}
 	if len(resp.Item) == 0 {
-		return -1, nil
+		return "unvoted", nil
 	}
-	return strconv.Atoi(*resp.Item["votes"].N)
+	return *resp.Item["votes"].N, nil
 }
 
 // SetVal sets value from DynamoDB
