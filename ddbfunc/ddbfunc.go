@@ -35,7 +35,7 @@ func GetVal(ddb *dynamodb.DynamoDB, key string) (string, error) {
 }
 
 // SetVal sets value from DynamoDB
-func SetVal(ddb *dynamodb.DynamoDB, key string, n string) {
+func SetVal(ddb *dynamodb.DynamoDB, key string, val string) {
 	param := &dynamodb.UpdateItemInput{
 		TableName: aws.String("bmo"),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -48,7 +48,7 @@ func SetVal(ddb *dynamodb.DynamoDB, key string, n string) {
 		},
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":vote_val": {
-				N: aws.String(n),
+				N: aws.String(val),
 			},
 		},
 		UpdateExpression:            aws.String("set #votes = :vote_val"),
