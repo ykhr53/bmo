@@ -8,28 +8,39 @@ https://github.com/nlopes/slack
 
 and some others... please see go.mod.
 
-## Env
+## Environment variables
 BMO requires three environment variables.
 
-- SLACKTOKEN:  
+- **SLACKTOKEN**  
 you can find it in your app's settings under *Install App* > *Bot User OAuth Access Token*  
 It starts with "xoxb-".  
-- VTOKEN:  
+- **VTOKEN**  
 It's in *Basic Information* setting, showed as "Verification Token".  
-- BOTUNAME:  
+- **BOTUNAME**  
 User name of the bot, starts with "U-"  
 
 ## Functions
 ### vote
 **Syntax**
+
+Increment *name*'s the number of votes.
 ```
 name++ <discription>
 ```
 
-Increment *name*'s the number of votes.  
+Decrement *name*'s the number of votes.
+```
+name-- <discription>
+```
+
+BMO can hook and combine multiple votes.
+```
+name++ name-- name++ foo++ <discription>
+```
 
 ## ToDo
 - add new functions 🆕
+- add ToDo things 🤔
 
 ## Done
 - enable counting number of votes 🔢
