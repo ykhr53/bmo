@@ -17,7 +17,7 @@ It starts with "xoxb-".
 - **VTOKEN**  
 It's in *Basic Information* setting, showed as "Verification Token".  
 - **BOTUNAME**  
-User name of the bot, starts with "U-"  
+Unique user ID of the bot, starts with "U"  
 
 ## Functions
 ### vote
