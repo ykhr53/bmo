@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +20,11 @@ import (
 
 	"github.com/ykhr53/bmo/ddbfunc"
 )
+
+type votes struct {
+	sum   int
+	count int
+}
 
 // BMO handles your task using following information.
 type BMO struct {
@@ -43,17 +49,23 @@ func NewBMO() *BMO {
 	return bmo
 }
 
-type votes struct {
-	sum   int
-	count int
+// ParseEvent override
+func (b *BMO) ParseEvent(rawEvent json.RawMessage, opts slackevents.Option) (slackevents.EventsAPIEvent, error) {
+	return slackevents.ParseEvent(rawEvent, opts)
+}
+
+type eventParser interface {
+	parseEvent(json.RawMessage, slackevents.Option) (slackevents.EventsAPIEvent, error)
 }
 
 func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("##### event in!!")
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
 	body := buf.String()
-	eventsAPIEvent, e := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: b.token}))
+	eventsAPIEvent, e := b.ParseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: b.token}))
 
+	fmt.Println("#### eventsAPIEvent ", eventsAPIEvent)
 	if e != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -76,6 +88,7 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 
 		case *slackevents.MessageEvent:
+			fmt.Println("ev.Text: ", ev.Text)
 			if ev.User != b.uname && votable(ev.Text) {
 				m := parse(ev.Text)
 				for name, votes := range m {
