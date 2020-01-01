@@ -20,12 +20,24 @@ import (
 	"github.com/ykhr53/bmo/ddbfunc"
 )
 
+type funcSet interface {
+	parseEvent(json.RawMessage, slackevents.Option) (slackevents.EventsAPIEvent, error)
+}
+
+type separator struct{}
+
+type votes struct {
+	sum   int
+	count int
+}
+
 // BMO handles your task using following information.
 type BMO struct {
 	token  string
 	uname  string
 	api    *slack.Client
 	client *dynamodb.DynamoDB
+	bridge funcSet
 }
 
 // NewBMO is BMO constructor.
@@ -39,20 +51,21 @@ func NewBMO() *BMO {
 	bmo.uname = getenv("BOTUNAME")
 	bmo.api = slack.New(oauthToken)
 	bmo.client = ddbClient
+	bmo.bridge = &separator{}
 
 	return bmo
 }
 
-type votes struct {
-	sum   int
-	count int
+func (s *separator) parseEvent(rawEvent json.RawMessage, opts slackevents.Option) (slackevents.EventsAPIEvent, error) {
+	return slackevents.ParseEvent(rawEvent, opts)
 }
 
+// ServeHTTP is hoge
 func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
 	body := buf.String()
-	eventsAPIEvent, e := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: b.token}))
+	eventsAPIEvent, e := b.bridge.parseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: b.token}))
 
 	if e != nil {
 		w.WriteHeader(http.StatusInternalServerError)
