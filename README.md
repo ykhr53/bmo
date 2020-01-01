@@ -1,4 +1,6 @@
 # BMO
+[![Build Status](https://travis-ci.org/ykhr53/bmo.svg?branch=master)](https://travis-ci.org/ykhr53/bmo)
+
 ## What's this
 BMO is a slack bot.
 
