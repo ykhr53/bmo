@@ -21,6 +21,12 @@ import (
 	"github.com/ykhr53/bmo/ddbfunc"
 )
 
+type funcSet interface {
+	parseEvent(json.RawMessage, slackevents.Option) (slackevents.EventsAPIEvent, error)
+}
+
+type separator struct{}
+
 type votes struct {
 	sum   int
 	count int
@@ -32,6 +38,7 @@ type BMO struct {
 	uname  string
 	api    *slack.Client
 	client *dynamodb.DynamoDB
+	bridge funcSet
 }
 
 // NewBMO is BMO constructor.
@@ -45,25 +52,22 @@ func NewBMO() *BMO {
 	bmo.uname = getenv("BOTUNAME")
 	bmo.api = slack.New(oauthToken)
 	bmo.client = ddbClient
+	bmo.bridge = &separator{}
 
 	return bmo
 }
 
-// ParseEvent override
-func (b *BMO) ParseEvent(rawEvent json.RawMessage, opts slackevents.Option) (slackevents.EventsAPIEvent, error) {
+func (s *separator) parseEvent(rawEvent json.RawMessage, opts slackevents.Option) (slackevents.EventsAPIEvent, error) {
 	return slackevents.ParseEvent(rawEvent, opts)
 }
 
-type eventParser interface {
-	parseEvent(json.RawMessage, slackevents.Option) (slackevents.EventsAPIEvent, error)
-}
-
+// ServeHTTP is hoge
 func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("##### event in!!")
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
 	body := buf.String()
-	eventsAPIEvent, e := b.ParseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: b.token}))
+	eventsAPIEvent, e := b.bridge.parseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: b.token}))
 
 	fmt.Println("#### eventsAPIEvent ", eventsAPIEvent)
 	if e != nil {

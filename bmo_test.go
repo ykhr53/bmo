@@ -2,30 +2,18 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/nlopes/slack"
 	"github.com/nlopes/slack/slackevents"
 )
 
-type fakeBMO struct {
-	child   *BMO
+type fakeSeparator struct {
 	message string
-	token   string
-	uname   string
-	api     *slack.Client
-	client  *dynamodb.DynamoDB
 }
 
-func (f *fakeBMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	f.child.ServeHTTP(w, r)
-}
-
-func (f *fakeBMO) ParseEvent(rawEvent json.RawMessage, opts slackevents.Option) (slackevents.EventsAPIEvent, error) {
+func (f *fakeSeparator) parseEvent(rawEvent json.RawMessage, opts slackevents.Option) (slackevents.EventsAPIEvent, error) {
 	e := &slackevents.EventsAPIEvent{}
 	e.Token = "foobar"
 	e.Type = slackevents.CallbackEvent
@@ -44,12 +32,12 @@ func (f *fakeBMO) ParseEvent(rawEvent json.RawMessage, opts slackevents.Option) 
 }
 
 func TestServe(t *testing.T) {
-	fbmo := new(fakeBMO)
-	fbmo.child = new(BMO)
-	fbmo.message = "!!!!!!!!!! yokohei test !!!!!!!!!!"
+	fakebmo := new(BMO)
+	fakebmo.bridge = &fakeSeparator{"comment!!!"}
+
 	req := httptest.NewRequest("POST", "/events-endpoint", nil)
 	rec := httptest.NewRecorder()
-	fbmo.ServeHTTP(rec, req)
+	fakebmo.ServeHTTP(rec, req)
 }
 
 func TestParse(t *testing.T) {
