@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -63,13 +62,11 @@ func (s *separator) parseEvent(rawEvent json.RawMessage, opts slackevents.Option
 
 // ServeHTTP is hoge
 func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("##### event in!!")
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
 	body := buf.String()
 	eventsAPIEvent, e := b.bridge.parseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: b.token}))
 
-	fmt.Println("#### eventsAPIEvent ", eventsAPIEvent)
 	if e != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -92,7 +89,6 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 
 		case *slackevents.MessageEvent:
-			fmt.Println("ev.Text: ", ev.Text)
 			if ev.User != b.uname && votable(ev.Text) {
 				m := parse(ev.Text)
 				for name, votes := range m {

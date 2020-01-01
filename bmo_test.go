@@ -21,7 +21,7 @@ func (f *fakeSeparator) parseEvent(rawEvent json.RawMessage, opts slackevents.Op
 	innerEvent := e.InnerEvent
 	innerEvent.Type = ""
 
-	var data slackevents.MessageEvent
+	data := new(slackevents.MessageEvent)
 	data.Text = f.message
 	data.User = "someone"
 	data.Channel = "some channel"
@@ -32,8 +32,10 @@ func (f *fakeSeparator) parseEvent(rawEvent json.RawMessage, opts slackevents.Op
 }
 
 func TestServe(t *testing.T) {
+	s := "please input a message you want to test"
+
 	fakebmo := new(BMO)
-	fakebmo.bridge = &fakeSeparator{"comment!!!"}
+	fakebmo.bridge = &fakeSeparator{s}
 
 	req := httptest.NewRequest("POST", "/events-endpoint", nil)
 	rec := httptest.NewRecorder()
