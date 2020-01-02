@@ -95,12 +95,17 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if votes.sum == 0 {
 						continue
 					}
-					curr, err := ddbfunc.GetVal(b.client, name)
-					if curr != "unvoted" && err == nil {
-						iv, _ := strconv.Atoi(curr)
-						iv = iv + votes.sum
-						sv := strconv.Itoa(iv)
+					// curr must be string typed number, "unvoted" or "err".
+					curr, _ := ddbfunc.GetVal(b.client, name)
+					if curr != "err" {
 						var text string
+						var iv int
+						var sv string
+						if curr != "unvoted" {
+							iv, _ = strconv.Atoi(curr)
+						}
+						iv = iv + votes.sum
+						sv = strconv.Itoa(iv)
 						if votes.count > 1 {
 							text = name + ": " + sv + " voted! (you got " + strconv.Itoa(votes.count) + " votes)"
 						} else {
