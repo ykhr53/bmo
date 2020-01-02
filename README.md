@@ -42,6 +42,7 @@ name++ name-- name++ foo++ <discription>
 ```
 
 ## ToDo
+- accept HTTP health check 👩‍⚕️
 - add new functions 🆕
 - add ToDo things 🤔
 
