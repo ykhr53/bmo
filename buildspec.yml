@@ -7,18 +7,15 @@ phases:
   pre_build:
     commands:
       - $(aws ecr get-login --no-include-email)
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7) 
-      - IMAGE_TAG=${COMMIT_HASH:=latest} 
-  build:   
-    commands:    
+  build: 
+    commands: 
       - CGO_ENABLED=0 go build
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG 
+      - docker build -t bmo .
+      - docker tag bmo:latest $REPOSITORY_URI:$latest
   post_build:
     commands:
       - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - printf '[{"name":"bmo","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json 
-artifacts:   
-  files:   
+      - printf '[{"name":"bmo","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+artifacts: 
+  files: 
     - imagedefinitions.json
