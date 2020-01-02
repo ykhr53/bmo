@@ -11,7 +11,7 @@ phases:
     commands: 
       - CGO_ENABLED=0 go build
       - docker build -t bmo .
-      - docker tag bmo:latest $REPOSITORY_URI:$latest
+      - docker tag bmo:latest $REPOSITORY_URI:latest
   post_build:
     commands:
       - docker push $REPOSITORY_URI:latest
