@@ -41,13 +41,5 @@ BMO can hook and combine multiple votes.
 name++ name-- name++ foo++ <discription>
 ```
 
-## ToDo
+## Features
 - accept HTTP health check 👩‍⚕️
-- add new functions 🆕
-- add ToDo things 🤔
-
-## Done
-- enable counting number of votes 🔢
-- combine multiple increments for the same name 🤝
-- decrement 👎
-- be unit testable 📝
