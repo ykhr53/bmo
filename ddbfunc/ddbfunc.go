@@ -26,7 +26,7 @@ func GetVal(ddb *dynamodb.DynamoDB, key string) (string, error) {
 	resp, err := ddb.GetItem(params)
 	if err != nil {
 		fmt.Println(err.Error())
-		return "unvoted", err
+		return "err", err
 	}
 	if len(resp.Item) == 0 {
 		return "unvoted", nil
