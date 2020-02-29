@@ -96,7 +96,7 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						continue
 					}
 					// curr must be string typed number, "unvoted" or "err".
-					curr, _ := ddbfunc.GetVal(b.client, name)
+					curr, _ := ddbfunc.GetVote(b.client, name)
 					if curr != "err" {
 						var text string
 						var iv int
@@ -112,7 +112,7 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							text = name + ": " + sv + " voted!"
 						}
 						b.api.PostMessage(ev.Channel, slack.MsgOptionText(text, false))
-						ddbfunc.SetVal(b.client, name, sv)
+						ddbfunc.SetVote(b.client, name, sv)
 					}
 				}
 			}
