@@ -93,11 +93,11 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				w := parseWord(ev.Text)
 				d, _ := ddbfunc.GetWord(b.client, w)
 				if d == "unknown" {
-					b.api.PostMessage(ev.Channel, slack.MsgOptionText("!add なんたら, description で登録してね (未実装)", false))
+					b.api.PostMessage(ev.Channel, slack.MsgOptionText("!add "+w+", なんたらかんたら で登録してね (未実装)", false))
 				} else if d == "err" {
 					b.api.PostMessage(ev.Channel, slack.MsgOptionText("エラーだよ 😢", false))
 				} else {
-					b.api.PostMessage(ev.Channel, slack.MsgOptionText(d, false))
+					b.api.PostMessage(ev.Channel, slack.MsgOptionText(w+": "+d, false))
 				}
 			}
 			if ev.User != b.uname && votable(ev.Text) {
