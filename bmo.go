@@ -89,11 +89,16 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 
 		case *slackevents.MessageEvent:
+			if ev.User != b.uname && add(ev.Text) {
+				s := parseAdd(ev.Text)
+				ddbfunc.SetWord(b.client, s[0], s[1])
+				b.api.PostMessage(ev.Channel, slack.MsgOptionText("登録しました！", false))
+			}
 			if ev.User != b.uname && word(ev.Text) {
 				w := parseWord(ev.Text)
 				d, _ := ddbfunc.GetWord(b.client, w)
 				if d == "unknown" {
-					b.api.PostMessage(ev.Channel, slack.MsgOptionText("!add "+w+", なんたらかんたら で登録してね (未実装)", false))
+					b.api.PostMessage(ev.Channel, slack.MsgOptionText("!add "+w+" なんたらかんたら で登録してね", false))
 				} else if d == "err" {
 					b.api.PostMessage(ev.Channel, slack.MsgOptionText("エラーだよ 😢", false))
 				} else {
@@ -193,4 +198,15 @@ func parseWord(text string) string {
 	r := regexp.MustCompile(`\!word\s\S+\s?`)
 	words := strings.Split(r.FindString(text), " ")
 	return words[1]
+}
+
+func add(text string) bool {
+	r := regexp.MustCompile(`^\!add\s\S+`)
+	return r.MatchString(text)
+}
+
+func parseAdd(text string) []string {
+	s := strings.TrimPrefix(text, "!add ")
+	words := strings.SplitN(s, " ", 2)
+	return words
 }
