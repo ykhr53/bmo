@@ -89,8 +89,19 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 
 		case *slackevents.MessageEvent:
+			if ev.User != b.uname && word(ev.Text) {
+				w := parseWord(ev.Text)
+				d, _ := ddbfunc.GetWord(b.client, w)
+				if d == "unknown" {
+					b.api.PostMessage(ev.Channel, slack.MsgOptionText("!add なんたら, description で登録してね (未実装)", false))
+				} else if d == "err" {
+					b.api.PostMessage(ev.Channel, slack.MsgOptionText("エラーだよ 😢", false))
+				} else {
+					b.api.PostMessage(ev.Channel, slack.MsgOptionText(d, false))
+				}
+			}
 			if ev.User != b.uname && votable(ev.Text) {
-				m := parse(ev.Text)
+				m := parseVote(ev.Text)
 				for name, votes := range m {
 					if votes.sum == 0 {
 						continue
@@ -143,7 +154,7 @@ func votable(text string) bool {
 	return r.MatchString(text)
 }
 
-func parse(text string) map[string]*votes {
+func parseVote(text string) map[string]*votes {
 	var isPositive bool
 	m := make(map[string]*votes)
 
@@ -171,4 +182,15 @@ func parse(text string) map[string]*votes {
 		}
 	}
 	return m
+}
+
+func word(text string) bool {
+	r := regexp.MustCompile(`\!word\s\S+`)
+	return r.MatchString(text)
+}
+
+func parseWord(text string) string {
+	r := regexp.MustCompile(`\!word\s\S+\s?`)
+	words := strings.Split(r.FindString(text), " ")
+	return words[1]
 }
