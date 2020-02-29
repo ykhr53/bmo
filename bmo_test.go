@@ -66,7 +66,7 @@ func TestParse(t *testing.T) {
 	}
 
 	for i, tc := range tests {
-		output := parse(tc.input)
+		output := parseVote(tc.input)
 		if !reflect.DeepEqual(output, tc.expectedOutput) {
 			t.Errorf("Test %d: test fails", i)
 		}
