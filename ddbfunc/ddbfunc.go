@@ -85,9 +85,9 @@ func GetWord(ddb *dynamodb.DynamoDB, key string) (string, error) {
 		return "err", err
 	}
 	if len(resp.Item) == 0 {
-		return "undescribed", nil
+		return "unknown", nil
 	}
-	return *resp.Item["votes"].N, nil
+	return *resp.Item["description"].S, nil
 }
 
 // SetWord sets word value to DynamoDB
