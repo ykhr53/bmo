@@ -89,6 +89,10 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 
 		case *slackevents.MessageEvent:
+			if ev.User != b.uname && words(ev.Text) {
+				s, _ := ddbfunc.GetWordList(b.client)
+				b.api.PostMessage(ev.Channel, slack.MsgOptionText(s, false))
+			}
 			if ev.User != b.uname && add(ev.Text) {
 				s := parseAdd(ev.Text)
 				ddbfunc.SetWord(b.client, s[0], s[1])
@@ -187,6 +191,11 @@ func parseVote(text string) map[string]*votes {
 		}
 	}
 	return m
+}
+
+func words(text string) bool {
+	r := regexp.MustCompile(`^\!words$`)
+	return r.MatchString(text)
 }
 
 func word(text string) bool {

@@ -118,3 +118,27 @@ func SetWord(ddb *dynamodb.DynamoDB, key string, val string) {
 		fmt.Println(err.Error())
 	}
 }
+
+// GetWordList gets the !word list
+func GetWordList(ddb *dynamodb.DynamoDB) (string, error) {
+	params := &dynamodb.ScanInput{
+		TableName:        aws.String("bmo"),
+		FilterExpression: aws.String("attribute_exists (description)"),
+	}
+
+	resp, err := ddb.Scan(params)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "err", err
+	}
+	if len(resp.Items) == 0 {
+		return "none", nil
+	}
+
+	out := ""
+	for _, i := range resp.Items {
+		out = out + *i["name"].S + ": " + *i["description"].S + "\n"
+	}
+	fmt.Println(out)
+	return out, nil
+}
