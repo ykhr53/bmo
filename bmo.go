@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -89,15 +90,33 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			b.api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 
 		case *slackevents.MessageEvent:
+			// !words command
 			if ev.User != b.uname && words(ev.Text) {
-				s, _ := ddbfunc.GetWordList(b.client)
-				b.api.PostMessage(ev.Channel, slack.MsgOptionText(s, false))
+				content, _ := ddbfunc.GetWordList(b.client)
+				params := slack.FileUploadParameters{
+					Title:    "words list",
+					Filename: "words",
+					Filetype: "post",
+					Content:  content,
+				}
+				file, err := b.api.UploadFile(params)
+				if err != nil {
+					fmt.Println("failed to create a file")
+				}
+				if file != nil {
+					link := file.Permalink
+					b.api.PostMessage(ev.Channel, slack.MsgOptionText(link, false))
+				}
 			}
+
+			// !add command
 			if ev.User != b.uname && add(ev.Text) {
 				s := parseAdd(ev.Text)
 				ddbfunc.SetWord(b.client, s[0], s[1])
 				b.api.PostMessage(ev.Channel, slack.MsgOptionText("登録しました！", false))
 			}
+
+			// !word command
 			if ev.User != b.uname && word(ev.Text) {
 				w := parseWord(ev.Text)
 				d, _ := ddbfunc.GetWord(b.client, w)
@@ -109,6 +128,8 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					b.api.PostMessage(ev.Channel, slack.MsgOptionText(w+": "+d, false))
 				}
 			}
+
+			// ++ command
 			if ev.User != b.uname && votable(ev.Text) {
 				m := parseVote(ev.Text)
 				for name, votes := range m {
