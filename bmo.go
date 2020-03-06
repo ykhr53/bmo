@@ -94,7 +94,7 @@ func (b *BMO) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if ev.User != b.uname && words(ev.Text) {
 				content, _ := ddbfunc.GetWordList(b.client)
 				params := slack.FileUploadParameters{
-					Title:    "words list",
+					Title:    "word list",
 					Filename: "words",
 					Filetype: "post",
 					Content:  content,
