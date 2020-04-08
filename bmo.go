@@ -45,7 +45,7 @@ type BMO struct {
 func NewBMO() *BMO {
 	bmo := new(BMO)
 
-	ddbClient := dynamodb.New(session.New(), aws.NewConfig().WithRegion("eu-west-1"))
+	ddbClient := dynamodb.New(session.New(), aws.NewConfig().WithRegion("ap-northeast-1"))
 	oauthToken := getenv("SLACKTOKEN")
 
 	bmo.token = getenv("VTOKEN")
