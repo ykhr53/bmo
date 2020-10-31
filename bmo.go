@@ -180,7 +180,7 @@ func getenv(name string) string {
 }
 
 func votable(text string) bool {
-	r := regexp.MustCompile(`\S+(\+\+|--)\s`)
+	r := regexp.MustCompile(`^\S+(\+\+|--)\s`)
 	return r.MatchString(text)
 }
 
